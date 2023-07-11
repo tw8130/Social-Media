@@ -17,7 +17,7 @@ module.exports = {
 
     getAllUsers: async(req, res) => {
         try {
-            const pool = require("../../../server").pool;
+            const pool = require("../../server").pool;
 
             let results = await pool.query(`SELECT * from NewUsers`)
 
@@ -85,7 +85,7 @@ module.exports = {
     // },
     registerUser: async(req, res) => {
         try {
-            const pool = require("../../../server").pool;
+            const pool = require("../../server").pool;
 
             //const { username, email, password, firstName, lastName } = req.body;
 
@@ -106,7 +106,7 @@ module.exports = {
 
             // Check if the username or email is already taken
 
-            const userExists = await pool
+            await pool
                 .request()
                 .input("username", value.username)
                 .input("email", value.email)
@@ -148,7 +148,7 @@ module.exports = {
 
     loginUser: async(req, res) => {
         try {
-            const pool = require("../../../server").pool;
+            const pool = require("../../server").pool;
 
             const { username, password } = req.body;
 
@@ -163,6 +163,10 @@ module.exports = {
             // Check if the user exists
             if (!user) {
                 return res.status(401).json({ error: "Invalid username or password" });
+            } else {
+                // Store the user ID in the session
+                req.session.userId = user.user_id;
+                req.session.authorized = true;
             }
 
             // Compare the provided password with the stored hashed password
@@ -172,7 +176,8 @@ module.exports = {
             }
 
             // Store the user ID in the session
-            req.session.userId = user.user_id;
+            // req.session.userId = user.user_id;
+            // req.session.authorized = true;
 
             res.status(200).json({ message: "Login successful" });
 
@@ -188,7 +193,8 @@ module.exports = {
             if (err) {
                 console.error("Error logging out:", err);
             }
-            res.redirect("/login");
+            //res.redirect("/login");
+            res.send("Logged out successfully")
         });
     },
 

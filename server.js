@@ -1,19 +1,22 @@
 const express = require('express');
 const app = express();
 const mssql = require('mssql')
-const session = require("../auth/src/middlewares/session");
-// const session = require('express-session');
-// const cron = require('node-cron')
-// const users = require('./data');
+const session = require("./src/middlewares/session");
+const RedisStore = require("connect-redis").default;
+const { createClient } = require("redis")
+    // const session = require('express-session');
+    // const cron = require('node-cron')
+    // const users = require('./data');
 require('dotenv').config();
 
 // const port = 4000;
 
 const port = process.env.PORT || 4000
 
-const router = require('../auth/src/routes/user');
-app.use(express.json());
+const router = require('./src/routes/user');
 app.use(session);
+app.use(express.json());
+
 
 app.use('/', router);
 
@@ -36,6 +39,21 @@ pool.connect((err) => {
 
 
 })
+
+const redisClient = createClient();
+redisClient.connect()
+console.log("Connected to Redis")
+
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: ''
+})
+
+// Close the Redis client when the server shuts down
+process.on("SIGINT", () => {
+    redisClient.quit();
+    process.exit();
+});
 
 app.use((req, res, next) => {
     req.pool = pool;

@@ -9,8 +9,8 @@ router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
 router.get('/logout', userController.logoutUser);
 router.get('/', userController.getAllUsers);
-//router.use(authorize)
-router.get('/landing', authorize, userController.landingPage);
+router.use(authorize)
+router.get('/landing', userController.landingPage);
 
 // router.get('/:id', userController.getUserById);
 // router.put('/:id', userController.updateUser);

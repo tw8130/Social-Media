@@ -1,6 +1,6 @@
 // middleware/auth.js
 function authorize(req, res, next) {
-    if (req.session.userId) {
+    if (req.session.userId && req.session.authorized) {
         // User is logged in
         next();
     } else {
